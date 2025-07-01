@@ -1,0 +1,47 @@
+# ----------------------------
+# Environnement virtuel
+# ----------------------------
+venv/
+.env/                # si tu utilises un dossier .env
+.venv/
+
+# ----------------------------
+# Fichiers Python compilés
+# ----------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ----------------------------
+# Distribution / packaging
+# ----------------------------
+build/
+dist/
+*.egg-info/
+pip-wheel-metadata/
+
+# ----------------------------
+# Tests
+# ----------------------------
+.pytest_cache/
+
+# ----------------------------
+# IDE / éditeur
+# ----------------------------
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# ----------------------------
+# Système
+# ----------------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# Logs et fichiers temporaires
+# ----------------------------
+*.log
+*.tmp
+*.swp
