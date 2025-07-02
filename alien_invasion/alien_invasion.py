@@ -98,6 +98,11 @@ class AlienInvasion:
             self.ship.center_ship()
             self.game_over = False
             pygame.mouse.set_visible(False)  # Hide the mouse cursor when game starts
+
+            # Start music when game starts
+            pygame.mixer.init()
+            pygame.mixer.music.load('sounds/background.mp3')
+            pygame.mixer.music.play(-1)
             
         button_clicked = self.button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
@@ -130,6 +135,10 @@ class AlienInvasion:
 
         # Check for bullet-alien collisions
         collisions = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        if collisions:
+            pygame.mixer.init()
+            gun_sound = pygame.mixer.Sound('sounds/gun-shot.mp3')
+            gun_sound.play()
 
     def _update_aliens(self):
         """Update the positions of all aliens in the fleet."""
@@ -146,6 +155,9 @@ class AlienInvasion:
     def _ship_hit(self):
         """Respond to the ship being hit by an alien."""
         if self.stats.ships_left > 0:
+            pygame.mixer.init()
+            pygame.mixer.music.load('sounds/gun-shot.mp3')
+            pygame.mixer.music.play(-1)
             # Decrement ships_left and reset the ship's position
             self.stats.ships_left -= 1
             self.ship.center_ship()
@@ -159,6 +171,7 @@ class AlienInvasion:
         else:
             self.stats.game_active = False
             self.game_over = True  # Set game over flag
+            pygame.mixer.music.stop()  # Stop the music
             print("Game Over!")
             sleep(3)
 
