@@ -7,6 +7,7 @@ from .bullet import Bullet
 from .alien import Alien
 from time import sleep
 from .game_stats import GameStats
+from .button import Button
 
 class AlienInvasion:
     """Overall class to manage game assets and behavior."""
@@ -20,11 +21,13 @@ class AlienInvasion:
         )
         pygame.display.set_caption("Alien Invasion")
         self.bg_color = (self.settings.bg_color)
+        self.button = Button(self, "Play")
         self.stats = GameStats(self.settings)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
+        self.game_over = False
 
     def _create_fleet(self):
         """Create a fleet of 15 aliens in 3 rows."""
@@ -70,16 +73,34 @@ class AlienInvasion:
                     self.ship.moving_left = True
                 elif event.key == pygame.K_SPACE:
                     self._fire_bullet()
-
             elif event.type == pygame.KEYUP:
                 if event.key == pygame.K_RIGHT:
                     self.ship.moving_right = False
-                elif event.key == pygame.K_LEFT:  
-                    self.ship.moving_left = False              
-            
-                    #sys.exit()
+                elif event.key == pygame.K_LEFT:
+                    self.ship.moving_left = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_pos = pygame.mouse.get_pos()
+                self._check_play_button(mouse_pos)
 
-    def _fire_bullet(self):
+    def _check_play_button(self, mouse_pos):
+        """Start a new game when the player clicks Play."""
+        if self.button.rect.collidepoint(mouse_pos) and not self.stats.game_active:
+            # Reset the game stats and start a new game
+            self.stats.reset_stats()
+            self.stats.game_active = True
+            self.aliens.empty()
+            self.bullets.empty()
+            self._create_fleet()
+            self.ship.center_ship()
+            self.game_over = False
+            pygame.mouse.set_visible(False)  # Hide the mouse cursor when game starts
+            
+        button_clicked = self.button.rect.collidepoint(mouse_pos)
+        if button_clicked and not self.stats.game_active:
+            pygame.mouse.set_visible(False)  # Hide the mouse cursor
+        else:
+            pygame.mouse.set_visible(True)  
+                    
         """Create a new bullet and add it to the bullets group."""
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
@@ -132,6 +153,7 @@ class AlienInvasion:
             sleep(0.5)
         else:
             self.stats.game_active = False
+            self.game_over = True  # Set game over flag
             print("Game Over!")
             sleep(3)
 
@@ -156,10 +178,14 @@ class AlienInvasion:
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
         if not self.stats.game_active:
-            font = pygame.font.SysFont(None, 74)
-            game_over_surface = font.render("GAME OVER", True, (255, 0, 0))
-            rect = game_over_surface.get_rect(center=self.screen.get_rect().center)
-            self.screen.blit(game_over_surface, rect)
+            pygame.mouse.set_visible(True)  # Show the mouse cursor when game is not active
+            if self.game_over:
+                font = pygame.font.SysFont(None, 74)
+                game_over_surface = font.render("GAME OVER", True, (255, 0, 0))
+                rect = game_over_surface.get_rect(center=self.screen.get_rect().center)
+                self.screen.blit(game_over_surface, rect)
+            else:
+                self.button.draw_button()
         pygame.display.flip()
         
 if __name__ == '__main__':
