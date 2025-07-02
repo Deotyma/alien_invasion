@@ -39,16 +39,19 @@ class AlienInvasion:
         alien_height = alien.rect.height
         alien.x = alien_width + 2 * alien_width * alien_number
         alien.rect.x = alien.x
-        alien.rect.y = alien_height -1 * alien_height * row_number
+        alien.rect.y = alien_height + 2 * alien_height * row_number
         self.aliens.add(alien)
 
     def run_game(self):
         """Start the main loop for the game."""
+        clock = pygame.time.Clock()
         while True:
             self._check_events()
             self.ship.update()
             self.bullets.update()
-            self._update_screen()  # Only call this!
+            self._update_aliens()
+            self._update_screen()
+            clock.tick(60)  # Limit to 60 frames per second
 
     def _check_events(self):
         """Respond to keypresses and mouse events."""
@@ -76,6 +79,29 @@ class AlienInvasion:
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
             self.bullets.add(new_bullet)
+
+    def _update_aliens(self):
+        """Update the positions of all aliens in the fleet."""
+        self._check_fleet_edges()
+        self.aliens.update()
+
+        # Check for collisions with the ship
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            print("Ship hit by alien!")  # Just print a message
+            # sys.exit()  # Remove or comment out this line
+
+    def _check_fleet_edges(self):
+        """Respond appropriately if any aliens have reached an edge."""
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                self._change_fleet_direction()
+                break
+
+    def _change_fleet_direction(self):
+        """Drop the entire fleet and change its direction."""
+        for alien in self.aliens.sprites():
+            alien.rect.y += self.settings.fleet_drop_speed
+        self.settings.fleet_direction *= -1  # Reverse direction
 
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
