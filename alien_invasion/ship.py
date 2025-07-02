@@ -27,6 +27,11 @@ class Ship:
 
         # Store a decimal value for the ship's center.
         self.center = float(self.rect.centerx)
+    
+    def center_ship(self):
+        """Center the ship on the screen."""
+        self.rect.centerx = self.screen_rect.centerx
+        self.x = float(self.rect.x)
 
     def update(self):
         """Update the ship's position based on the movement flag."""
