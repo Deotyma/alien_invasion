@@ -105,6 +105,7 @@ class AlienInvasion:
         else:
             pygame.mouse.set_visible(True)  
                     
+    def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
         if len(self.bullets) < self.settings.bullets_allowed:
             new_bullet = Bullet(self)
