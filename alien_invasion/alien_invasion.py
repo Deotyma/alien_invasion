@@ -29,6 +29,10 @@ class AlienInvasion:
         self._create_fleet()
         self.game_over = False
 
+        # Load and scale the background image
+        self.bg_image = pygame.image.load('images/stars.jpg')
+        self.bg_image = pygame.transform.scale(self.bg_image, (self.settings.screen_width, self.settings.screen_height))
+
     def _create_fleet(self):
         """Create a fleet of 15 aliens in 3 rows."""
         number_aliens_x = 5  # 5 aliens per row
@@ -173,6 +177,7 @@ class AlienInvasion:
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.bg_color)
+        self.screen.blit(self.bg_image, (0, 0))  # Draw the background image
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
