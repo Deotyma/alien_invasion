@@ -4,6 +4,7 @@ import pygame
 from .settings import Settings
 from .ship import Ship
 from .bullet import Bullet
+from .alien import Alien
 
 class AlienInvasion:
     """Overall class to manage game assets and behavior."""
@@ -19,7 +20,27 @@ class AlienInvasion:
         self.bg_color = (self.settings.bg_color)
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
-        
+        self.aliens = pygame.sprite.Group()
+        self._create_fleet()
+
+    def _create_fleet(self):
+        """Create a fleet of 15 aliens in 3 rows."""
+        number_aliens_x = 5  # 5 aliens per row
+        number_rows = 3      # 3 rows
+
+        for row_number in range(number_rows):
+            for alien_number in range(number_aliens_x):
+                self._create_alien(alien_number, row_number)
+
+    def _create_alien(self, alien_number, row_number):
+        """Create an alien and place it in the row."""
+        alien = Alien(self)
+        alien_width = alien.rect.width
+        alien_height = alien.rect.height
+        alien.x = alien_width + 2 * alien_width * alien_number
+        alien.rect.x = alien.x
+        alien.rect.y = alien_height -1 * alien_height * row_number
+        self.aliens.add(alien)
 
     def run_game(self):
         """Start the main loop for the game."""
@@ -27,8 +48,7 @@ class AlienInvasion:
             self._check_events()
             self.ship.update()
             self.bullets.update()
-            self._update_screen()
-            self.ship.blitme() # Draw the ship at its current location.
+            self._update_screen()  # Only call this!
 
     def _check_events(self):
         """Respond to keypresses and mouse events."""
@@ -63,9 +83,9 @@ class AlienInvasion:
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
+        pygame.display.flip()  # <-- Add this line
         
-        pygame.display.flip()
-
 if __name__ == '__main__':
     # Make a game instance, and run the game.
     ai = AlienInvasion()
