@@ -36,6 +36,7 @@ class Settings:
         self.ship_speed = 1.5
         self.bullet_speed = 3.0
         self.alien_speed = 1.0
+        self.alien_points = 50  # Points for each alien hit
 
         # Scoring
         self.alien_points = 50

@@ -8,6 +8,7 @@ from .alien import Alien
 from time import sleep
 from .game_stats import GameStats
 from .button import Button
+from .scoreboard import Scoreboard
 
 class AlienInvasion:
     """Overall class to manage game assets and behavior."""
@@ -24,6 +25,7 @@ class AlienInvasion:
         self.button = Button(self, "Play")
         self.stats = GameStats(self.settings)
         self.ship = Ship(self)
+        self.sb = Scoreboard(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
@@ -143,6 +145,8 @@ class AlienInvasion:
             pygame.mixer.init()
             gun_sound = pygame.mixer.Sound('sounds/gun-shot.mp3')
             gun_sound.play()
+            self.stats.score += self.settings.alien_points * len(collisions)
+            self.sb.prep_score()  # Update the scoreboard
 
     def _update_aliens(self):
         """Update the positions of all aliens in the fleet."""
@@ -208,6 +212,7 @@ class AlienInvasion:
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
+        self.sb.show_score()  # Draw the scoreboard
         if not self.stats.game_active:
             pygame.mouse.set_visible(True)  # Show the mouse cursor when game is not active
             if self.game_over:
@@ -262,6 +267,13 @@ class AlienInvasion:
             if alien.rect.y <= alien_height:
                 return False
         return True
+        
+    def show_score(self):
+        """Draw score, level, and ships to the screen."""
+        self.screen.blit(self.score_image, self.score_rect)
+        # If you have level and ships, draw them too:
+        # self.screen.blit(self.level_image, self.level_rect)
+        # self.ships.draw(self.screen)
         
 if __name__ == '__main__':
     # Make a game instance, and run the game.
