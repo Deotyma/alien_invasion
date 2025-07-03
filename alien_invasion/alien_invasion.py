@@ -107,6 +107,7 @@ class AlienInvasion:
         button_clicked = self.button.rect.collidepoint(mouse_pos)
         if button_clicked and not self.stats.game_active:
             pygame.mouse.set_visible(False)  # Hide the mouse cursor
+            self.settings.initialize_dynamic_settings()  # Reset settings
         else:
             pygame.mouse.set_visible(True)  
                     
@@ -166,6 +167,7 @@ class AlienInvasion:
             self.bullets.empty()
             # Create a new fleet of aliens
             self._create_fleet()
+            self.settings.increase_speed()  # Increase the speed of the game
             # Pause the game for a moment
             sleep(0.5)
         else:
