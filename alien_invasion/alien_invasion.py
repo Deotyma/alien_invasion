@@ -34,9 +34,12 @@ class AlienInvasion:
         self.bg_image = pygame.transform.scale(self.bg_image, (self.settings.screen_width, self.settings.screen_height))
 
     def _create_fleet(self):
-        """Create a fleet of 15 aliens in 3 rows."""
-        number_aliens_x = 5  # 5 aliens per row
-        number_rows = 3      # 3 rows
+        """Create a fleet of aliens with 4 rows."""
+        alien = Alien(self)
+        alien_width = alien.rect.width
+        alien_height = alien.rect.height
+        number_aliens_x = self._get_number_aliens_x(alien_width)
+        number_rows = 1  # Always start with 1 row
 
         for row_number in range(number_rows):
             for alien_number in range(number_aliens_x):
@@ -143,14 +146,17 @@ class AlienInvasion:
 
     def _update_aliens(self):
         """Update the positions of all aliens in the fleet."""
+        # Add a new row if there is space and the game is active
+        if self.stats.game_active and not self._aliens_touch_ship_or_bottom() and self._space_for_new_row():
+            self._add_alien_row()
+
         self._check_fleet_edges()
         self.aliens.update()
         self._check_aliens_bottom()
 
         # Check for collisions with the ship
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
-            print("Ship hit by alien!")  # Just print a message
-            # sys.exit()  # Remove or comment out this line
+            print("Ship hit by alien!")
             self._ship_hit()
 
     def _ship_hit(self):
@@ -190,6 +196,10 @@ class AlienInvasion:
             alien.rect.y += self.settings.fleet_drop_speed
         self.settings.fleet_direction *= -1  # Reverse direction
 
+        # Add a new row if the lowest alien is not touching the ship or bottom
+        if not self._aliens_touch_ship_or_bottom():
+            self._add_alien_row()
+
     def _update_screen(self):
         """Update images on the screen, and flip to the new screen."""
         self.screen.fill(self.bg_color)
@@ -208,6 +218,50 @@ class AlienInvasion:
             else:
                 self.button.draw_button()
         pygame.display.flip()
+        
+    def _get_number_aliens_x(self, alien_width):
+        """Determine the number of aliens that fit in a row."""
+        available_space_x = self.settings.screen_width - (2 * alien_width)
+        number_aliens_x = available_space_x // (2 * alien_width)
+        return int(number_aliens_x)
+
+    def _get_number_rows(self, alien_height, ship_height):
+        """Determine the number of rows of aliens that fit on the screen."""
+        available_space_y = (self.settings.screen_height -
+                             (3 * alien_height) - ship_height)
+        number_rows = available_space_y // (2 * alien_height)
+        return int(number_rows)
+    
+    def _add_alien_row(self):
+        """Add a new row of aliens at the top."""
+        alien = Alien(self)
+        alien_width = alien.rect.width
+        alien_height = alien.rect.height
+
+        # Move all existing aliens down by one row
+        for alien in self.aliens.sprites():
+            alien.rect.y += alien_height
+
+        # Now create the new row at the top
+        number_aliens_x = self._get_number_aliens_x(alien_width)
+        for alien_number in range(number_aliens_x):
+            self._create_alien(alien_number, 0)  # row_number=0 for the top row
+
+    def _aliens_touch_ship_or_bottom(self):
+        """Return True if any alien touches the ship or bottom of the screen."""
+        for alien in self.aliens.sprites():
+            if alien.rect.bottom >= self.ship.rect.top or alien.rect.bottom >= self.settings.screen_height:
+                return True
+        return False
+    
+    def _space_for_new_row(self):
+        """Return True if there is space at the top for a new row of aliens."""
+        alien = Alien(self)
+        alien_height = alien.rect.height
+        for alien in self.aliens.sprites():
+            if alien.rect.y <= alien_height:
+                return False
+        return True
         
 if __name__ == '__main__':
     # Make a game instance, and run the game.

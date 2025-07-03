@@ -22,8 +22,8 @@ class Settings:
 
         # Alien settings
         self.alien_speed = 1
-        self.alien_width = 80
-        self.alien_height = 60  
+        self.alien_width = 60   # Try 60 instead of 80
+        self.alien_height = 40  # Try 40 instead of 60
         self.fleet_drop_speed = 1
         self.fleet_direction = 1  # 1 represents right; -1 represents left   
 
@@ -45,3 +45,16 @@ class Settings:
         self.ship_speed *= 1.1
         self.bullet_speed *= 1.1
         self.alien_speed *= 1.1
+
+    def _get_number_aliens_x(self, alien_width):
+        """Determine the number of aliens that fit in a row."""
+        available_space_x = self.settings.screen_width - (2 * alien_width)
+        number_aliens_x = available_space_x // (2 * alien_width)
+        return int(number_aliens_x)
+
+    def _get_number_rows(self, alien_height, ship_height):
+        """Determine the number of rows of aliens that fit on the screen."""
+        available_space_y = (self.settings.screen_height -
+                             (3 * alien_height) - ship_height)
+        number_rows = available_space_y // (2 * alien_height)
+        return int(number_rows)
