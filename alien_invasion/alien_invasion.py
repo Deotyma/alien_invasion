@@ -147,6 +147,7 @@ class AlienInvasion:
             gun_sound.play()
             self.stats.score += self.settings.alien_points * len(collisions)
             self.sb.prep_score()  # Update the scoreboard
+            self.sb.check_high_score()  # Check for new high score
 
     def _update_aliens(self):
         """Update the positions of all aliens in the fleet."""
