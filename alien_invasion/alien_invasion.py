@@ -179,6 +179,8 @@ class AlienInvasion:
             # Create a new fleet of aliens
             self._create_fleet()
             self.settings.increase_speed()  # Increase the speed of the game
+            self.stats.level += 1  # Increase the level
+            self.sb.prep_level()  # Update the level display
             # Pause the game for a moment
             sleep(0.5)
         else:
