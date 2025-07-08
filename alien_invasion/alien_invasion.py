@@ -9,6 +9,7 @@ from time import sleep
 from .game_stats import GameStats
 from .button import Button
 from .scoreboard import Scoreboard
+from .button_music import ButtonMusic  # Import ButtonMusic class
 
 class AlienInvasion:
     """Overall class to manage game assets and behavior."""
@@ -23,6 +24,10 @@ class AlienInvasion:
         pygame.display.set_caption("Alien Invasion")
         self.bg_color = (self.settings.bg_color)
         self.button = Button(self, "Play")
+        self.button_music = ButtonMusic(self, "🎵")  # Initialize music button
+        self.button_music.rect.left = 20
+        self.button_music.rect.top = 20
+        self.button_music.msg_image_rect.center = self.button_music.rect.center  # Keep text centered
         self.stats = GameStats(self.settings)
         self.ship = Ship(self)
         self.sb = Scoreboard(self)
@@ -30,6 +35,7 @@ class AlienInvasion:
         self.aliens = pygame.sprite.Group()
         self._create_fleet()
         self.game_over = False
+        self.music_on = True  # Music is on by default
 
         # Load and scale the background image
         self.bg_image = pygame.image.load('images/stars.jpg')
@@ -89,7 +95,10 @@ class AlienInvasion:
                     self.ship.moving_left = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_pos = pygame.mouse.get_pos()
-                self._check_play_button(mouse_pos)
+                if self.button_music.rect.collidepoint(mouse_pos):
+                    self._toggle_music()
+                else:
+                    self._check_play_button(mouse_pos)
 
     def _check_play_button(self, mouse_pos):
         """Start a new game when the player clicks Play."""
@@ -116,6 +125,17 @@ class AlienInvasion:
         else:
             pygame.mouse.set_visible(True)  
                     
+    def _toggle_music(self):
+        """Toggle background music on/off."""
+        if self.music_on:
+            pygame.mixer.music.pause()
+            self.music_on = False
+            self.button_music._prep_msg("🔇")  # Use muted speaker for OFF
+        else:
+            pygame.mixer.music.unpause()
+            self.music_on = True
+            self.button_music._prep_msg("🎵")  # Use note for ON
+
     def _fire_bullet(self):
         """Create a new bullet and add it to the bullets group."""
         if len(self.bullets) < self.settings.bullets_allowed:
@@ -216,6 +236,10 @@ class AlienInvasion:
             bullet.draw_bullet()
         self.aliens.draw(self.screen)
         self.sb.show_score()  # Draw the scoreboard
+
+        # Always show the music button
+        self.button_music.draw_button()
+
         if not self.stats.game_active:
             pygame.mouse.set_visible(True)  # Show the mouse cursor when game is not active
             if self.game_over:
